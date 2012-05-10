@@ -246,14 +246,14 @@ public class ExecutionNodeTreeBuilder {
     }
 
 
-    /**
-     * @param subStepsMapLocal
-     * @param step
-     * @return
-     */
-    private ParentStep locateSubStepsParent(final PatternMap<ParentStep> subStepsMapLocal,
-            final Step step) {
-        ParentStep substepsParent = subStepsMapLocal.get(step.getLine(), 0);
+	/**
+	 * @param subStepsMapLocal
+	 * @param step
+	 * @return
+	 */
+	private ParentStep locateSubStepsParent(final PatternMap<ParentStep> subStepsMapLocal, final Step step)
+	{
+		ParentStep substepsParent = subStepsMapLocal.get(step.getLine(), 0);
 
         // TODO WIP
         // if we're not strict then we can look for other step defs that fit
@@ -274,25 +274,19 @@ public class ExecutionNodeTreeBuilder {
                         break;
                     }
 
-                    // final List<StepImplementation> altStepImplementations =
-                    // getStrictStepimplementation(altKeyword,
-                    // parameterLine.replaceFirst(keyword, altKeyword),
-                    // okNotTofindAnything);
-                    // if (!altStepImplementations.isEmpty()) {
-                    // // found an alternative, bail immediately
-                    // list = new
-                    // ArrayList<StepImplementation>(Collections2.transform(altStepImplementations,
-                    // new
-                    // CloneStepImplementationsWithNewKeywordFunction(keyword)));
-                    // break;
-                    // }
-                }
-            }
+				}
+			}
 
-        }
-
-        return substepsParent;
-    }
+		}
+		
+		// to allow tables to passed down the chain into substeps
+		if (step.getInlineTable() != null && substepsParent != null){
+			
+			substepsParent.getParent().setInlineTable(step.getInlineTable());
+		}
+		
+		return substepsParent;
+	}
 
 
     public void substituteStepParameters(final Map<String, String> parametersForSteps,
@@ -423,10 +417,16 @@ public class ExecutionNodeTreeBuilder {
             if (parent != null) {
                 paramValueMap = parent.getParamValueMap();
             }
+            
+            List<Map<String, String>> resolvedInlineTable = inlineTable; 
+            if (resolvedInlineTable == null && parent != null){
+            	resolvedInlineTable = parent.getParent().getInlineTable();
+            }
 
             final Object[] methodParameters = getStepMethodArguments(stepParameter, paramValueMap,
-                    execImpl.getValue(), inlineTable, stepImplementationMethodParameterTypes,
-                    parameterConverters, stepNode);
+                    execImpl.getValue(), resolvedInlineTable, stepImplementationMethodParameterTypes,
+                    parameterConverters,
+                    stepNode);
 
             if (methodParameters.length != stepImplementationMethodParameterTypes.length) {
                 throw new IllegalArgumentException(
