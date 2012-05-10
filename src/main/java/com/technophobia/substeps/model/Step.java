@@ -20,7 +20,7 @@ package com.technophobia.substeps.model;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -43,13 +43,8 @@ public class Step {
 	// the whole original line, eg Given blah blah
 	private final String line;
 
-	// the remainder of the line, eg blah blah
-	// private final String param;
-
 	// a string that can be manipulated for variable substituion
 	private String parameterLine;
-
-//	private List<Description> junitDescriptionList;
 
 	private List<Map<String, String>> inlineTable = null;
 
@@ -59,28 +54,6 @@ public class Step {
 
 	private File source;
 	
-//	/**
-//	 * @return the junitDescription
-//	 */
-//	public Description getJunitDescription(final int i) {
-//		return junitDescriptionList != null ? junitDescriptionList.get(i) : null;
-//	}
-
-//	public Description getJunitDescription() {
-//		return junitDescriptionList != null ? junitDescriptionList.get(0) : null;
-//	}
-
-	/**
-	 * @param junitDescription
-	 *            the junitDescription to set
-//	 */
-//	public void addJunitDescription(final Description junitDescription) {
-//		if (junitDescriptionList == null) {
-//			junitDescriptionList = new ArrayList<Description>();
-//		}
-//		junitDescriptionList.add(junitDescription);
-//	}
-
 	/**
 	 * @return the line
 	 */
@@ -93,7 +66,7 @@ public class Step {
 	}
 
 	
-	public Step(final String line, File source) {
+	public Step(final String line, final File source) {
 		this(line, false, source);
 	}
 
@@ -101,7 +74,7 @@ public class Step {
 		this(theLine, isSubStep, null);
 	}
 	
-	public Step(final String theLine, final boolean isSubStep, File source) {
+	public Step(final String theLine, final boolean isSubStep, final File source) {
 		if (theLine == null || theLine.length() == 0) {
 			throw new IllegalArgumentException("null or empty args");
 		}
@@ -127,18 +100,14 @@ public class Step {
 		} else if (line.length() > 0) {
 			// we've got just an annotation with no parameter
 			keyword = line;
-			// param = "";
-		} else {
-			// param = null;
-		}
+		} 
 
 	}
 
 	// only used in tests
-	public Step(final String keyword, /* final String param, */final String line, final boolean isSubStep) {
+	public Step(final String keyword, final String line, final boolean isSubStep) {
 		this.keyword = keyword;
 		this.line = line;
-		// this.param = param;
 
 		if (isSubStep) {
 			setParamAndParamNames();
@@ -151,7 +120,7 @@ public class Step {
 
 		// look for params
 		final Pattern p = Pattern.compile("(<([^>]*)>)");
-		// final Matcher matcher = p.matcher(param);
+
 		final Matcher matcher = p.matcher(line);
 
 		int findIdx = 0;
@@ -166,7 +135,6 @@ public class Step {
 
 		// replace the params with a reg ex, a quoted and non quoted variant
 
-		// pattern = param.replaceAll("(<[^>]*>)", "\"?([^\"]*)\"?");
 		pattern = line.replaceAll("(<[^>]*>)", "\"?([^\"]*)\"?");
 	}
 
@@ -197,11 +165,6 @@ public class Step {
 		return pattern;
 	}
 
-	// public String getParam()
-	// {
-	// return param;
-	// }
-
 	public List<String> getParamNames() {
 		return paramNames;
 	}
@@ -218,7 +181,7 @@ public class Step {
 			if (inlineTable == null) {
 				inlineTable = new ArrayList<Map<String, String>>();
 			}
-			final Map<String, String> map = new HashMap<String, String>();
+			final Map<String, String> map = new LinkedHashMap<String, String>();
 			inlineTable.add(map);
 
 			for (int i = 1; i < tableHeadings.length; i++) {
@@ -230,7 +193,6 @@ public class Step {
 	}
 
 	public String getParameterLine() {
-		// return parameterLine != null ? parameterLine : param;
 		return parameterLine != null ? parameterLine : line;
 
 	}
@@ -257,7 +219,7 @@ public class Step {
 	/**
 	 * @param replacedInlineTable
 	 */
-	public void setSubstitutedInlineTable(List<Map<String, String>> substitutedInlineTable)
+	public void setSubstitutedInlineTable(final List<Map<String, String>> substitutedInlineTable)
 	{
 		this.substitutedInlineTable = substitutedInlineTable;
 	}
@@ -270,8 +232,8 @@ public class Step {
 		return source;
 	}
 	
-	public Step cloneWithAlternativeLine(String alt){
-		Step step = new Step(alt, this.pattern !=null);
+	public Step cloneWithAlternativeLine(final String alt){
+		final Step step = new Step(alt, this.pattern !=null);
 		
 		step.inlineTable = this.inlineTable;
 				
@@ -283,5 +245,12 @@ public class Step {
 		
 		
 		return step;
+	}
+
+	/**
+	 * @param inlineTable2
+	 */
+	public void setInlineTable(final List<Map<String, String>> inlineTable){
+		this.inlineTable = inlineTable;
 	}
 }

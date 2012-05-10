@@ -497,5 +497,49 @@ public class BDDRunnerTest extends BaseBDDRunnerTest {
         verify(notifier, times(5)).fireTestFailure(argThat(any(Failure.class)));
 
     }
+    
+    
+    @Test
+    public void testInlineTableParameterPassedThroughToSubStep() {
+
+        final JunitFeatureRunner runner = new JunitFeatureRunner();
+
+        final List<Class<?>> stepImplsList = new ArrayList<Class<?>>();
+        stepImplsList.add(BDDRunnerStepImplementations.class);
+
+        // pass in the stuff that would normally be placed in the annotation
+        runner.init(this.getClass(), stepImplsList,
+                "./target/test-classes/features/tableParamsToSubSteps.feature", "table_as_a_parameter",
+                "./target/test-classes/substeps/table_param.substeps");
+
+        final BDDRunnerStepImplementations stepImpls = new BDDRunnerStepImplementations();
+        final BDDRunnerStepImplementations spy = spy(stepImpls);
+
+        // get hold of the step runner
+        // implsCache.put(execImpl.implementedIn, target);
+        final HashMap<Class<?>, Object> implsCache = getImplsCache(runner);
+
+        implsCache.put(BDDRunnerStepImplementations.class, spy);
+
+        final RunNotifier notifier = mock(RunNotifier.class);
+
+        runner.run(notifier);
+
+        // now verify that what was run was indeed run
+
+        final List<Map<String, String>> table = new ArrayList<Map<String, String>>();
+        final Map<String, String> row = new HashMap<String, String>();
+        row.put("param1", "W");
+        row.put("param2", "X");
+        row.put("param3", "Y");
+        row.put("param4", "Z");
+        table.add(row);
+
+        verify(spy, times(1)).meth10(table);
+        
+        verify(spy, times(1)).meth12();
+
+    }
+
 
 }

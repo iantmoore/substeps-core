@@ -9,3 +9,4 @@ Tags: nested_params_bug
   Scenario: A nested parameter passing scenario 
         Given I register on Liferay 6 as "Basic" "Flow"
         
+       
