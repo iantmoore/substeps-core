@@ -34,7 +34,6 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
 import com.google.common.io.InputSupplier;
@@ -319,11 +318,8 @@ public class ExecutionReportBuilder {
     	
     	String display = getDisplay(node.getDepth());
     	
-//    	System.out.println("<div id dd" + (node.getId() -1) + " start");
-    	
-    	
     	if (node.getParent() == null && node.hasChildren()){
-	    	parentDivStart(node.getId() -1, buf, display);
+	    	parentDivStart(node.getId() -1, buf, display, node.getDepth());
     		
     	}
     	
@@ -332,9 +328,8 @@ public class ExecutionReportBuilder {
 	    	if (node.hasChildren()){
 	    
 	    		display = getDisplay(node.getDepth()+1);
-	    		parentDivStart(node.getId(), buf, display);
-	    		
-	    		// todo - no <div id="dd3" class="clip" style="display: block;"> IF NO CHILDREN
+
+	    		parentDivStart(node.getId(), buf, display, node.getDepth());
 	    		
 	    		for (final ExecutionNode child: node.getChildren()){
 	    			buf.append("<!-- child id " + child.getId() + " -->");
@@ -347,14 +342,6 @@ public class ExecutionReportBuilder {
 	    		buf.append("</div>");
 	    	}
     	
-	    	if (node.hasChildren()){	
-//		    System.out.println("<div id dd" + (node.getId() -1) + " end");
-	
-//	    	buf.append("</div> <!-- dd id ")
-//	    	.append(node.getId() -1)
-//	    	.append(" buildTreeString end -->")
-//	    	;
-	    	}    	
     }
 
 
@@ -378,11 +365,11 @@ public class ExecutionReportBuilder {
 	 * @param buf
 	 * @param display
 	 */
-	public void parentDivStart(final long id, final StringBuilder buf, final String display)
+	public void parentDivStart(final long id, final StringBuilder buf, final String display, final int depth)
 	{
 		buf.append("<div id=\"dd")
 		.append(id)
-		.append("\" class=\"clip\" style=\"display: ")
+		.append("\" class=\"clip depth" + depth + "\" style=\"display: ")
 		.append(display)
 		.append(";\">");
 	}
